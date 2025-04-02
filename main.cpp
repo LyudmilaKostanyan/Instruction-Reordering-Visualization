@@ -1,5 +1,6 @@
 #include <iostream>
-#include "kaizen.h" // Assuming this provides zen::timer
+#include <cmath>
+#include "kaizen.h"
 
 void delay_function(volatile size_t& value, const size_t iterations) {
     for (size_t i = 0; i < iterations; ++i) {
@@ -42,14 +43,22 @@ double test_dependent(const size_t iterations) {
 }
 
 int main() {
-    const size_t iterations = 1000000000;
-    std::cout << "Number of iterations: " << iterations << "\n";
-    
-    std::cout << "Test 1: Independent operations (ROB possible)\n";
-    std::cout << "Independent operations: " << test_independent(iterations) << " ms\n";
-    
-    std::cout << "\nTest 2: Dependent operations (no ROB)\n";
-    std::cout << "Dependent operations: " << test_dependent(iterations) << " ms\n";
+    const size_t iterations = 100000000;
+
+    double indep = test_independent(iterations);
+    double dep = test_dependent(iterations);
+
+    std::cout << "Number of iterations: " << iterations << "\n\n";
+    std::cout << std::setw(35) << std::left << "Operation Type" 
+              << std::setw(20) << "Time (ms)" << "\n";
+    std::cout << std::string(50, '-') << "\n";
+    std::cout << std::setw(35) << "Independent Operations (ROB)" 
+              << std::setw(20) << std::fixed << std::setprecision(2) << indep << "\n";
+    std::cout << std::setw(35) << "Dependent Operations (No ROB)" 
+              << std::setw(20) << dep << "\n";
+    std::cout << std::string(50, '-') << "\n";
+    std::cout << std::setw(35) << "Difference" 
+              << std::setw(20) << std::abs(indep - dep) << "\n";
 
     return 0;
 }
