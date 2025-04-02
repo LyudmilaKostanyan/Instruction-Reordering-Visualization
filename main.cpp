@@ -42,8 +42,14 @@ double test_dependent(const size_t iterations) {
     return duration;
 }
 
-int main() {
-    const size_t iterations = 100000000;
+int main(int argc, char** argv) {
+    size_t iterations = 100000000;
+    zen::cmd_args args(argv, argc);
+    if (args.is_present("--n")) {
+        auto num = std::stoi(args.get_options("--n")[0]);
+        if (num > 0)
+            iterations = num;
+    }
 
     double indep = test_independent(iterations);
     double dep = test_dependent(iterations);
