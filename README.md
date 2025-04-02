@@ -17,30 +17,29 @@ The **Reorder Buffer (ROB)** is a hardware component in modern CPUs that enables
 - **Dependent Operations**: Data dependencies prevent reordering, forcing sequential execution.
 
 ## Example Output
-Here’s an example output from running the program with 100,000,000 iterations:
+Here’s an example output from running the program with 1,000,000,000 iterations:
 
 ```
-Number of iterations: 100000000
+Number of iterations: 1000000000
 
 Operation Type                     Time (ms)
 --------------------------------------------------
-Independent Operations (ROB)       1968.00
-Dependent Operations (No ROB)      1890.00
+Independent Operations (ROB)       5007.00
+Dependent Operations (No ROB)      5503.00
 --------------------------------------------------
-Difference                         78.00
+Difference                         496.00
 ```
 
 ### Explanation of Output
-- **Number of iterations**: The number of loop iterations in `delay_function` (100,000,000), controlling the workload size.
-- **Independent Operations (ROB)**: Time taken (1968.00 ms) for three independent calls to `delay_function`. The CPU’s ROB might reorder or overlap these, but in this case, it took longer than expected (see below).
-- **Dependent Operations (No ROB)**: Time taken (1890.00 ms) for three dependent calls to `delay_function`. These must run sequentially due to dependencies.
-- **Difference**: The difference between independent and dependent times (1968.00 - 1890.00 = 78.00 ms). A positive value indicates independent operations took *more* time, which is unusual—typically, independent operations should be faster due to ROB optimization. This could result from:
-  - **Measurement Noise**: Small iteration counts or system variability might skew results.
-  - **CPU Behavior**: The specific CPU might not effectively reorder these operations, or caching effects could dominate.
-  - **Workload**: The `delay_function` might not be complex enough to benefit from reordering on this scale.
+- **Number of iterations**: The number of loop iterations in `delay_function` (1,000,000,000), controlling the workload size.
+- **Independent Operations (ROB)**: Time taken (5007.00 ms) for three independent calls to `delay_function`. The CPU’s ROB can reorder or overlap these operations, leading to a shorter execution time compared to dependent operations.
+- **Dependent Operations (No ROB)**: Time taken (5503.00 ms) for three dependent calls to `delay_function`. These must run sequentially due to data dependencies, resulting in a longer execution time.
+- **Difference**: The difference between dependent and independent times (5503.00 - 5007.00 = 496.00 ms). A positive value indicates that dependent operations took more time, which aligns with expectations: the ROB optimizes independent operations, reducing their total runtime. This demonstrates the effectiveness of out-of-order execution for independent tasks. Factors influencing the result include:
+  - **CPU Architecture**: The degree of reordering depends on the CPU’s ROB size and out-of-order execution capabilities.
+  - **Workload Design**: The `delay_function` provides a measurable delay, and with a large iteration count (1 billion), the benefits of reordering become more pronounced.
+  - **System Variability**: Minor fluctuations may occur due to background processes or caching, but the large iteration count helps minimize noise.
 
-For a clearer demonstration, increasing iterations or averaging multiple runs might better highlight ROB benefits (e.g., independent time < dependent time).
-
+For even clearer results, averaging multiple runs or testing on different CPUs could further validate the ROB’s impact.
 
 ### Build the Project
 
@@ -65,7 +64,7 @@ Example with arguments:
 ```bash
 ./build/main.exe --n 5000000
 ```
-Example without arguments (uses default matrix size):
+Example without arguments (uses default iteration count):
 ```bash
 ./build/main.exe
 ```
